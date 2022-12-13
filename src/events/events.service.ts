@@ -178,7 +178,7 @@ export class EventsService {
       },
       where: {
         workshops: {
-          start: MoreThan(format(new Date(), 'yyyy-mm-dd hh:mm:ss')),
+          start: MoreThan(new Date().toISOString()),
         },
       },
       order: {

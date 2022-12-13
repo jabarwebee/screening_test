@@ -85,28 +85,14 @@ export class MenuItemsService {
         }
     ]
   */
-  async getMenuItems(): Promise<object[]> {
+  async getMenuItems(): Promise<MenuItem[]> {
     const menuItems = await this.menuItemRepository.find();
-    return this.createTree(menuItems);
+    const roots = menuItems.filter((c) => c.parentId === null);
+    return roots.map((c) => this.createTree(c, menuItems));
   }
-
-  private createTree(items: any[]): object[] {
-    const map = items.reduce((map, item) => {
-      map[item.id] = item;
-      return map;
-    }, {});
-
-    const tree: object[] = [];
-    items.forEach((item) => {
-      if (item.parentId) {
-        if (!map[item.parentId].children) {
-          map[item.parentId].children = [];
-        }
-        map[item.parentId].children.push(item);
-      } else {
-        tree.push(item);
-      }
-    });
-    return tree;
+  private createTree(meniItem: MenuItem, menuItems: MenuItem[]): MenuItem {
+    meniItem.children = menuItems.filter((c) => c.parentId === meniItem.id);
+    meniItem.children.forEach((c: MenuItem) => this.createTree(c, menuItems));
+    return meniItem;
   }
 }
